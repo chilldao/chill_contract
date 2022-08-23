@@ -24,6 +24,8 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
       uint256 currentCnt ;
       uint256 startId;
       uint256 endId;
+      uint256 []tMaxCnt;
+      uint256 []tCnt;
     }
     mapping (address=>minerControl) public _miners;
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -71,23 +73,34 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
         return super.supportsInterface(interfaceId);
     }
 
-    function addMintAddr(address to, uint256 expireTs, uint256 maxCnt, uint256 startId, uint256 endId) external onlyOwner {
-        minerControl storage c = _miners[to];
-        c.expireTs = expireTs;
-        c.maxCnt = maxCnt;
-        c.currentCnt = 0;
-        c.startId = startId;
-        c.endId = endId;
+    function addMintAddr(address to, uint256 expireTs, uint256 maxCnt,
+                         uint256 startId, uint256 endId, uint256[] memory tMaxCnt)
+                         external onlyOwner {
+        require(tMaxCnt.length == MaxType + 1, "tMaxCnt length error");
+        minerControl storage m = _miners[to];
+        m.expireTs = expireTs;
+        m.maxCnt = maxCnt;
+        m.currentCnt = 0;
+        m.startId = startId;
+        m.endId = endId;
+        delete m.tMaxCnt;
+        delete m.tCnt;
+        for (uint256 index = 0; index < tMaxCnt.length; index++) {
+          m.tMaxCnt[index] = tMaxCnt[index];
+          m.tCnt[index] = tMaxCnt[index];
+        }
     }
 
     function platformMint(address to, uint256 tokenId, uint256 t) external {
-        minerControl storage c = _miners[to];
-        require(block.timestamp < c.expireTs, "mint permission has expired");
-        require(c.currentCnt < c.maxCnt, "The number of mint has been used up");
-        require(c.startId <= tokenId && tokenId <= c.endId , "mint is out of allowable range");
+        minerControl storage m = _miners[to];
+        require(block.timestamp < m.expireTs, "mint permission has expired");
+        require(m.currentCnt < m.maxCnt, "The number of mint has been used up");
+        require(m.startId <= tokenId && tokenId <= m.endId , "mint is out of allowable range");
         require(t <= MaxType, "t error");
+        require(m.tCnt[t] < m.tMaxCnt[t], "The type is full");
         _safeMint(to, tokenId);
-        c.currentCnt++;
+        m.currentCnt++;
+        m.tCnt[t]++;
         property storage p = _properties[tokenId];
         p.t = t;
     }
