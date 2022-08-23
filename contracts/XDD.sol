@@ -121,8 +121,8 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         uint256 amount = queryClaimPrivateUnLockFunds(msg.sender);
         require(amount > 0, "The address has no locked private funds");
         _mint(msg.sender, amount);
-        teamClaimed[msg.sender] += amount;
-        emit ClaimPrivateUnLockFunds(amount, teamClaimed[msg.sender]);
+        privateClaimed[msg.sender] += amount;
+        emit ClaimPrivateUnLockFunds(amount, privateClaimed[msg.sender]);
     }
 
     function claimAdviserUnLockFunds() external {
