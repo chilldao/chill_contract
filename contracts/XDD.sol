@@ -54,9 +54,9 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         __ERC20Burnable_init();
         __Ownable_init();
         _mint(msg.sender, TotalSupply - PrivateLock - AdviserLock - TeamLock);
-        setPrivateUnLockTs(0, 31104000); //31104000 = 12 * 30 * 24 * 60 * 60
-        setAdviserUnLockTs(0, 62208000); //62208000 = 24 * 30 * 24 * 60 * 60
-        setTeamUnLockTs(0, 62208000);
+        setPrivateUnLockTs(block.timestamp, 31104000); //31104000 = 12 * 30 * 24 * 60 * 60
+        setAdviserUnLockTs(block.timestamp, 62208000); //62208000 = 24 * 30 * 24 * 60 * 60
+        setTeamUnLockTs(block.timestamp, 62208000);
     }
 
     function setPrivateUnLockTs(uint256 ts, uint256 duration) public onlyOwner {

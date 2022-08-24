@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable {
-    string private _buri;
+    string public _buri;
 
     uint8 private constant MaxType = 4;
 
@@ -86,14 +86,14 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
         delete m.tMaxCnt;
         delete m.tCnt;
         for (uint256 index = 0; index < tMaxCnt.length; index++) {
-          m.tMaxCnt[index] = tMaxCnt[index];
-          m.tCnt[index] = tMaxCnt[index];
+          m.tMaxCnt.push(tMaxCnt[index]);
+          m.tCnt.push(0);
         }
     }
 
     function platformMint(address to, uint256 tokenId, uint256 t) external {
-        minerControl storage m = _miners[to];
-        require(block.timestamp < m.expireTs, "mint permission has expired");
+        minerControl storage m = _miners[msg.sender];
+        require(block.timestamp < m.expireTs, "mint not allowed or permission has expired");
         require(m.currentCnt < m.maxCnt, "The number of mint has been used up");
         require(m.startId <= tokenId && tokenId <= m.endId , "mint is out of allowable range");
         require(t <= MaxType, "t error");

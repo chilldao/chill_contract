@@ -1,9 +1,9 @@
-import { ethers } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 
 async function main() {
 
     const Contract = await ethers.getContractFactory("AiWatchNFT");
-    const contract = await Contract.deploy();
+    const contract = await upgrades.deployProxy(Contract, [], {kind: 'transparent'});
 
     await contract.deployed();
 
