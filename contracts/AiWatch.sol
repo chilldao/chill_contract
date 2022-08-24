@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable {
     string public _buri;
 
-    uint8 private constant MaxType = 4;
+    uint8 private constant MaxType = 5;
 
     struct property {
       uint256 t; //type
@@ -49,7 +49,7 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
     }
 
     function mint(address to, uint256 tokenId, uint256 t) external onlyOwner {
-        require(t <= MaxType, "t error");
+        require(t > 0 && t <= MaxType, "t error");
         _safeMint(to, tokenId);
         property storage p = _properties[tokenId];
         p.t = t;
@@ -76,7 +76,7 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
     function addMintAddr(address to, uint256 expireTs, uint256 maxCnt,
                          uint256 startId, uint256 endId, uint256[] memory tMaxCnt)
                          external onlyOwner {
-        require(tMaxCnt.length == MaxType + 1, "tMaxCnt length error");
+        require(tMaxCnt.length == MaxType, "tMaxCnt length error");
         minerControl storage m = _miners[to];
         m.expireTs = expireTs;
         m.maxCnt = maxCnt;
@@ -96,11 +96,11 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
         require(block.timestamp < m.expireTs, "mint not allowed or permission has expired");
         require(m.currentCnt < m.maxCnt, "The number of mint has been used up");
         require(m.startId <= tokenId && tokenId <= m.endId , "mint is out of allowable range");
-        require(t <= MaxType, "t error");
-        require(m.tCnt[t] < m.tMaxCnt[t], "The type is full");
+        require(t > 0 && t <= MaxType, "t error");
+        require(m.tCnt[t-1] < m.tMaxCnt[t-1], "The type is full");
         _safeMint(to, tokenId);
         m.currentCnt++;
-        m.tCnt[t]++;
+        m.tCnt[t-1]++;
         property storage p = _properties[tokenId];
         p.t = t;
     }

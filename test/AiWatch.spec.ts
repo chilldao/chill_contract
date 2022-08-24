@@ -43,7 +43,7 @@ describe("AiWatch", function () {
         contract,
         owner,
       } = await loadFixture(deployAiWatchFixture);
-      await expect(contract.mint(owner.address, 1, 5)).to.be.revertedWith(
+      await expect(contract.mint(owner.address, 1, 6)).to.be.revertedWith(
         "t error"
       );
     });
@@ -124,12 +124,15 @@ describe("AiWatch", function () {
         "mint not allowed or permission has expired")
       const currentTs = await time.latest();
       await contract.addMintAddr(otherAccount.address,
-        currentTs + ONE_YEAR_IN_SECS, 3, 10000, 20000, [0,1,2,4,5])
+        currentTs + ONE_YEAR_IN_SECS, 3, 10000, 20000, [1,2,3,4,5])
       await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 10000, 5)).to.be.revertedWith(
+        owner.address, 10000, 6)).to.be.revertedWith(
         "t error")
       await expect(contract.connect(otherAccount).platformMint(
         owner.address, 9999, 1)).to.be.revertedWith(
+        "mint is out of allowable range")
+      await expect(contract.connect(otherAccount).platformMint(
+        owner.address, 20001, 1)).to.be.revertedWith(
         "mint is out of allowable range")
       await contract.connect(otherAccount).platformMint(
         owner.address, 10000, 2)
@@ -139,9 +142,9 @@ describe("AiWatch", function () {
         owner.address, 10002, 2)).to.be.revertedWith(
         "The type is full")
       await contract.connect(otherAccount).platformMint(
-        owner.address, 10003, 3)
+        owner.address, 10003, 4)
       await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 10004, 3)).to.be.revertedWith(
+        owner.address, 10004, 4)).to.be.revertedWith(
         "The number of mint has been used up")
     });
   });
