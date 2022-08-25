@@ -1,8 +1,6 @@
 import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
-import { contracts } from "../typechain-types";
 
 const ONE_YEAR_IN_SECS = 12 * 30 * 24 * 60 * 60;
 describe("AiWatch", function () {
@@ -90,62 +88,6 @@ describe("AiWatch", function () {
       expect(await contract.tokenURI(2)).to.equal(url + "2");
       expect(await contract._properties(1)).to.equal(1);
       expect(await contract._properties(2)).to.equal(2);
-    });
-  });
-
-  describe("Authorize mint", function () {
-    it("Should revert with tMaxCnt length error", async function () {
-      const {
-        contract,
-        otherAccount,
-      } = await loadFixture(deployAiWatchFixture);
-
-      const currentTs = await time.latest();
-      await expect(contract.addMintAddr(otherAccount.address,
-        currentTs + ONE_YEAR_IN_SECS, 10, 10000, 20000, [1,2,3,4,5,6])).to.be.revertedWith(
-        "tMaxCnt length error");
-
-      await expect(contract.addMintAddr(otherAccount.address,
-        currentTs + ONE_YEAR_IN_SECS, 10, 10000, 20000, [1,2,3,4])).to.be.revertedWith(
-        "tMaxCnt length error");
-    });
-  });
-
-  describe("platformMint", function () {
-    it("Should revert with error", async function () {
-      const {
-        contract,
-        owner,
-        otherAccount,
-      } = await loadFixture(deployAiWatchFixture);
-
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 1, 1)).to.be.revertedWith(
-        "mint not allowed or permission has expired")
-      const currentTs = await time.latest();
-      await contract.addMintAddr(otherAccount.address,
-        currentTs + ONE_YEAR_IN_SECS, 3, 10000, 20000, [1,2,3,4,5])
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 10000, 6)).to.be.revertedWith(
-        "t error")
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 9999, 1)).to.be.revertedWith(
-        "mint is out of allowable range")
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 20001, 1)).to.be.revertedWith(
-        "mint is out of allowable range")
-      await contract.connect(otherAccount).platformMint(
-        owner.address, 10000, 2)
-      await contract.connect(otherAccount).platformMint(
-        owner.address, 10001, 2)
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 10002, 2)).to.be.revertedWith(
-        "The type is full")
-      await contract.connect(otherAccount).platformMint(
-        owner.address, 10003, 4)
-      await expect(contract.connect(otherAccount).platformMint(
-        owner.address, 10004, 4)).to.be.revertedWith(
-        "The number of mint has been used up")
     });
   });
 });

@@ -18,16 +18,6 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
 
     mapping (uint256=>property) public _properties;
 
-    struct minerControl {
-      uint256 expireTs;
-      uint256 maxCnt ;
-      uint256 currentCnt ;
-      uint256 startId;
-      uint256 endId;
-      uint256 []tMaxCnt;
-      uint256 []tCnt;
-    }
-    mapping (address=>minerControl) public _miners;
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -71,38 +61,6 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-
-    function addMintAddr(address to, uint256 expireTs, uint256 maxCnt,
-                         uint256 startId, uint256 endId, uint256[] memory tMaxCnt)
-                         external onlyOwner {
-        require(tMaxCnt.length == MaxType, "tMaxCnt length error");
-        minerControl storage m = _miners[to];
-        m.expireTs = expireTs;
-        m.maxCnt = maxCnt;
-        m.currentCnt = 0;
-        m.startId = startId;
-        m.endId = endId;
-        delete m.tMaxCnt;
-        delete m.tCnt;
-        for (uint256 index = 0; index < tMaxCnt.length; index++) {
-          m.tMaxCnt.push(tMaxCnt[index]);
-          m.tCnt.push(0);
-        }
-    }
-
-    function platformMint(address to, uint256 tokenId, uint256 t) external {
-        minerControl storage m = _miners[msg.sender];
-        require(block.timestamp < m.expireTs, "mint not allowed or permission has expired");
-        require(m.currentCnt < m.maxCnt, "The number of mint has been used up");
-        require(m.startId <= tokenId && tokenId <= m.endId , "mint is out of allowable range");
-        require(t > 0 && t <= MaxType, "t error");
-        require(m.tCnt[t-1] < m.tMaxCnt[t-1], "The type is full");
-        _safeMint(to, tokenId);
-        m.currentCnt++;
-        m.tCnt[t-1]++;
-        property storage p = _properties[tokenId];
-        p.t = t;
     }
 }
 
