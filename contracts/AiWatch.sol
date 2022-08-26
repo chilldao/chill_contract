@@ -10,14 +10,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable {
     string public _buri;
 
-    uint8 private constant MaxType = 5;
-
-    struct property {
-      uint256 t; //type
-    }
-
-    mapping (uint256=>property) public _properties;
-
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -38,11 +30,8 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
         _buri = buri;
     }
 
-    function mint(address to, uint256 tokenId, uint256 t) external onlyOwner {
-        require(t > 0 && t <= MaxType, "t error");
+    function mint(address to, uint256 tokenId) external onlyOwner {
         _safeMint(to, tokenId);
-        property storage p = _properties[tokenId];
-        p.t = t;
     }
 
     // The following functions are overrides required by Solidity.

@@ -36,22 +36,12 @@ describe("AiWatch", function () {
   });
 
   describe("owner mint", function () {
-    it("Should revert with the t error", async function () {
-      const {
-        contract,
-        owner,
-      } = await loadFixture(deployAiWatchFixture);
-      await expect(contract.mint(owner.address, 1, 6)).to.be.revertedWith(
-        "t error"
-      );
-    });
-
     it("Should mint correctly", async function () {
       const {
         contract,
         owner,
       } = await loadFixture(deployAiWatchFixture);
-      await expect(contract.mint(owner.address, 1, 1))
+      await expect(contract.mint(owner.address, 1))
         .to.emit(contract, "Transfer")
         .withArgs(
           "0x0000000000000000000000000000000000000000",
@@ -65,8 +55,8 @@ describe("AiWatch", function () {
         contract,
         owner,
       } = await loadFixture(deployAiWatchFixture);
-      await contract.mint(owner.address, 1, 1);
-      await expect(contract.mint(owner.address, 1, 1)).to.be.revertedWith(
+      await contract.mint(owner.address, 1);
+      await expect(contract.mint(owner.address, 1)).to.be.revertedWith(
         "ERC721: token already minted"
       );
     });
@@ -78,16 +68,14 @@ describe("AiWatch", function () {
         contract,
         owner
       } = await loadFixture(deployAiWatchFixture);
-      await contract.mint(owner.address, 1, 1)
+      await contract.mint(owner.address, 1)
       expect(await contract.tokenURI(1)).to.equal("");
       expect(await contract._buri()).to.equal("");
       const url = "https://chill_img.org/";
       await contract.setBaseURI(url)
       expect(await contract.tokenURI(1)).to.equal(url + "1");
-      await contract.mint(owner.address, 2, 2)
+      await contract.mint(owner.address, 2)
       expect(await contract.tokenURI(2)).to.equal(url + "2");
-      expect(await contract._properties(1)).to.equal(1);
-      expect(await contract._properties(2)).to.equal(2);
     });
   });
 });
