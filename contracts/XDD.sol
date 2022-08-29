@@ -82,6 +82,15 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
               queryclaimAdviserUnLockFunds(user),
               queryclaimTeamUnLockFunds(user));
     }
+    function queryPrivateTotalLockFunds(address user) view public returns (uint256){
+      return PrivateLock * privateLockAddr[user] / ONE_HUNDRED_PERCENT;
+    }
+    function queryAdviserTotalLockFunds(address user) view public returns (uint256){
+      return AdviserLock * adviserLockAddr[user] / ONE_HUNDRED_PERCENT;
+    }
+    function queryTeamTotalLockFunds(address user) view public returns (uint256){
+      return TeamLock * teamLockAddr[user] / ONE_HUNDRED_PERCENT;
+    }
     function queryClaimPrivateUnLockFunds(address user) view public returns (uint256){
       if (block.timestamp <= privateUnLockTs) {
         return 0;

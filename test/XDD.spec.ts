@@ -176,6 +176,33 @@ describe("XDD", function () {
       expect(await contract.teamLockTotalPercent()).to.equal(
         teamAddr1Percent + teamAddr2Percent + teamAddr3Percent
       );
+      expect(await contract.queryPrivateTotalLockFunds(account1.address)).to.equal(
+        PrivateLock * privateAddr1Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryPrivateTotalLockFunds(account2.address)).to.equal(
+        PrivateLock * privateAddr2Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryPrivateTotalLockFunds(account3.address)).to.equal(
+        PrivateLock * privateAddr3Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryAdviserTotalLockFunds(account1.address)).to.equal(
+        AdviserLock * adviserAddr1Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryAdviserTotalLockFunds(account2.address)).to.equal(
+        AdviserLock * adviserAddr2Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryAdviserTotalLockFunds(account3.address)).to.equal(
+        AdviserLock * adviserAddr3Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryTeamTotalLockFunds(account1.address)).to.equal(
+        TeamLock * teamAddr1Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryTeamTotalLockFunds(account2.address)).to.equal(
+        TeamLock * teamAddr2Percent / ONE_HUNDRED_PERCENT
+      );
+      expect(await contract.queryTeamTotalLockFunds(account3.address)).to.equal(
+        TeamLock * teamAddr3Percent / ONE_HUNDRED_PERCENT
+      );
 
       await time.increaseTo(unlockTime + 10 * ONE_YEAR_IN_SECS);
 
