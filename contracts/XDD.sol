@@ -12,6 +12,10 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
     uint256 public constant PrivateLock = TotalSupply * 16 / 100; // 16%
     uint256 public constant AdviserLock = TotalSupply * 2 / 100; // 2%
     uint256 public constant TeamLock = TotalSupply * 15 / 100; // 15%
+    uint256 public constant EcologyAmount = TotalSupply * 20 / 100; // 20%
+    uint256 public constant AIfitness_EarnAmount = TotalSupply * 35 / 100; // 35%
+    uint256 public constant MarketAmount = TotalSupply * 5 / 100; // 5%
+    uint256 public constant LaunchpadAmount = TotalSupply * 7 / 100; // 7%
 
     uint256 public privateUnLockTs;
     uint256 public privateUnLockDuration;
@@ -53,10 +57,13 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         __ERC20_init("XDD Coin", "XDD");
         __ERC20Burnable_init();
         __Ownable_init();
-        _mint(msg.sender, TotalSupply - PrivateLock - AdviserLock - TeamLock);
-        setPrivateUnLockTs(block.timestamp, 31104000); //31104000 = 12 * 30 * 24 * 60 * 60
-        setAdviserUnLockTs(block.timestamp, 62208000); //62208000 = 24 * 30 * 24 * 60 * 60
-        setTeamUnLockTs(block.timestamp, 62208000);
+        _mint(0x67d8ca48504BABc28BE8a8CcD508Bfe257bDBeaD, EcologyAmount);
+        _mint(0x692344eDdD98CB581a248D630cf62A5AfEbC65AB, AIfitness_EarnAmount);
+        _mint(0x22F1Bbe80351216890fB210A386Fe4a36835B22f, MarketAmount);
+        _mint(0x083f17ACacFB34Dcd786BFC723eBB9c4D3b65A04, LaunchpadAmount);
+        setPrivateUnLockTs(block.timestamp + 31104000, 31104000); //31104000 = 12 * 30 * 24 * 60 * 60
+        setAdviserUnLockTs(block.timestamp + 31104000, 62208000); //62208000 = 24 * 30 * 24 * 60 * 60
+        setTeamUnLockTs(block.timestamp + 31104000, 62208000);
     }
 
     function setPrivateUnLockTs(uint256 ts, uint256 duration) public onlyOwner {

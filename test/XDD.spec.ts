@@ -14,6 +14,10 @@ describe("XDD", function () {
     const PrivateLock = (TotalSupply * 16n) / 100n;
     const AdviserLock = (TotalSupply * 2n) / 100n;
     const TeamLock = (TotalSupply * 15n) / 100n;
+    const EcologyAmount = (TotalSupply * 20n) / 100n;
+    const AIfitness_EarnAmount = (TotalSupply * 35n) / 100n;
+    const MarketAmount = (TotalSupply * 5n) / 100n;
+    const LaunchpadAmount = (TotalSupply * 7n) / 100n;
     const FirstMintAmount = TotalSupply - PrivateLock - AdviserLock - TeamLock;
 
     // Contracts are deployed using the first signer/account by default
@@ -30,6 +34,10 @@ describe("XDD", function () {
       PrivateLock,
       AdviserLock,
       TeamLock,
+      EcologyAmount,
+      AIfitness_EarnAmount,
+      MarketAmount,
+      LaunchpadAmount,
       FirstMintAmount,
       otherAccount,
     };
@@ -44,6 +52,10 @@ describe("XDD", function () {
         PrivateLock,
         AdviserLock,
         TeamLock,
+        EcologyAmount,
+        AIfitness_EarnAmount,
+        MarketAmount,
+        LaunchpadAmount,
         FirstMintAmount,
       } = await loadFixture(deployXDDFixture);
 
@@ -57,6 +69,10 @@ describe("XDD", function () {
       expect(await contract.PrivateLock()).to.equal(PrivateLock);
       expect(await contract.AdviserLock()).to.equal(AdviserLock);
       expect(await contract.TeamLock()).to.equal(TeamLock);
+      expect(await contract.EcologyAmount()).to.equal(EcologyAmount);
+      expect(await contract.AIfitness_EarnAmount()).to.equal(AIfitness_EarnAmount);
+      expect(await contract.MarketAmount()).to.equal(MarketAmount);
+      expect(await contract.LaunchpadAmount()).to.equal(LaunchpadAmount);
       expect(await contract.totalSupply()).to.equal(FirstMintAmount);
     });
 
