@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
@@ -10,12 +10,14 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable {
     string public _buri;
 
+    event SetBaseURI(string uri);
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    function initialize() initializer public {
+    function initialize() initializer external {
         __ERC721_init("AiWatchNFT", "AiWatch");
         __ERC721Enumerable_init();
         __ERC721Burnable_init();
@@ -28,6 +30,7 @@ contract AiWatchNFT is Initializable, ERC721Upgradeable, ERC721EnumerableUpgrade
 
     function setBaseURI(string memory buri) external onlyOwner {
         _buri = buri;
+        emit SetBaseURI(buri);
     }
 
     function mint(address to, uint256 tokenId) external onlyOwner {

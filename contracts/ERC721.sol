@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
+contract NFT is ERC721Enumerable, ERC721Burnable, Ownable {
     string private _buri;
+
+    event SetBaseURI(string uri);
 
     constructor(string memory name, string memory symbol)
         ERC721(name, symbol) {}
@@ -16,11 +17,12 @@ contract NFT is ERC721, ERC721Enumerable, ERC721Burnable, Ownable {
         return _buri;
     }
 
-    function setBaseURI(string memory buri) public onlyOwner {
+    function setBaseURI(string memory buri) external onlyOwner {
         _buri = buri;
+        emit SetBaseURI(buri);
     }
 
-    function mint(address to, uint256 tokenId) public onlyOwner {
+    function mint(address to, uint256 tokenId) external onlyOwner {
         _safeMint(to, tokenId);
     }
 

@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, OwnableUpgradeable {
+contract XDD is ERC20BurnableUpgradeable, OwnableUpgradeable {
     uint8 private constant DECIMAL = 18;
     uint256 public constant TotalSupply = 5 * 10 ** 9 * 10 ** DECIMAL; // 5,000,000,000
     uint256 public constant PrivateLock = TotalSupply * 16 / 100; // 16%
@@ -43,6 +41,9 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
     event ClaimPrivateUnLockFunds(uint256 amount, uint256 total);
     event ClaimAdviserUnLockFunds(uint256 amount, uint256 total);
     event ClaimTeamUnLockFunds(uint256 amount, uint256 total);
+    event SetPrivateLockAddr(address to, uint256 percent);
+    event SetAdviserLockAddr(address to, uint256 percent);
+    event SetTeamLockAddr(address to, uint256 percent);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -53,7 +54,7 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         return DECIMAL;
     }
 
-    function initialize() initializer public {
+    function initialize() initializer external {
         __ERC20_init("XDD Coin", "XDD");
         __ERC20Burnable_init();
         __Ownable_init();
@@ -89,13 +90,13 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
               queryclaimAdviserUnLockFunds(user),
               queryclaimTeamUnLockFunds(user));
     }
-    function queryPrivateTotalLockFunds(address user) view public returns (uint256){
+    function queryPrivateTotalLockFunds(address user) view external returns (uint256){
       return PrivateLock * privateLockAddr[user] / ONE_HUNDRED_PERCENT;
     }
-    function queryAdviserTotalLockFunds(address user) view public returns (uint256){
+    function queryAdviserTotalLockFunds(address user) view external returns (uint256){
       return AdviserLock * adviserLockAddr[user] / ONE_HUNDRED_PERCENT;
     }
-    function queryTeamTotalLockFunds(address user) view public returns (uint256){
+    function queryTeamTotalLockFunds(address user) view external returns (uint256){
       return TeamLock * teamLockAddr[user] / ONE_HUNDRED_PERCENT;
     }
     function queryClaimPrivateUnLockFunds(address user) view public returns (uint256){
@@ -118,7 +119,7 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         duration = adviserUnLockDuration;
       }
       return AdviserLock * adviserLockAddr[user] * duration /
-        privateUnLockDuration / ONE_HUNDRED_PERCENT - adviserClaimed[user];
+        adviserUnLockDuration / ONE_HUNDRED_PERCENT - adviserClaimed[user];
     }
     function queryclaimTeamUnLockFunds(address user) view public returns (uint256){
       if (block.timestamp <= teamUnLockTs) {
@@ -129,7 +130,7 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
         duration = teamUnLockDuration;
       }
       return TeamLock * teamLockAddr[user] * duration /
-        privateUnLockDuration / ONE_HUNDRED_PERCENT - teamClaimed[user];
+        teamUnLockDuration / ONE_HUNDRED_PERCENT - teamClaimed[user];
     }
 
     function claimPrivateUnLockFunds() external {
@@ -162,9 +163,9 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
     function setPrivateLockAddr(address[] memory to, uint256[] memory percent) external onlyOwner {
         require(to.length == percent.length, "length error");
         for (uint256 i = 0; i < to.length; i++) {
-            privateLockTotalPercent -= privateLockAddr[to[i]];
+            privateLockTotalPercent = privateLockTotalPercent - privateLockAddr[to[i]] + percent[i];
             privateLockAddr[to[i]] = percent[i];
-            privateLockTotalPercent += percent[i];
+            emit SetPrivateLockAddr(to[i], percent[i]);
         }
         require(privateLockTotalPercent <= ONE_HUNDRED_PERCENT,
                 "Too many private funds raised");
@@ -173,9 +174,9 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
     function setAdviserLockAddr(address[] memory to, uint256[] memory percent) external onlyOwner {
         require(to.length == percent.length, "length error");
         for (uint256 i = 0; i < to.length; i++) {
-            adviserLockTotalPercent -= adviserLockAddr[to[i]];
+            adviserLockTotalPercent = adviserLockTotalPercent - adviserLockAddr[to[i]] + percent[i];
             adviserLockAddr[to[i]] = percent[i];
-            adviserLockTotalPercent += percent[i];
+            emit SetAdviserLockAddr(to[i], percent[i]);
         }
         require(adviserLockTotalPercent <= ONE_HUNDRED_PERCENT,
                 "Too many adviser funds raised");
@@ -184,9 +185,9 @@ contract XDD is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, Ownab
     function setTeamLockAddr(address[] memory to, uint256[] memory percent) external onlyOwner {
         require(to.length == percent.length, "length error");
         for (uint256 i = 0; i < to.length; i++) {
-            teamLockTotalPercent -= teamLockAddr[to[i]];
+            teamLockTotalPercent = teamLockTotalPercent - teamLockAddr[to[i]] + percent[i];
             teamLockAddr[to[i]] = percent[i];
-            teamLockTotalPercent += percent[i];
+            emit SetTeamLockAddr(to[i], percent[i]);
         }
         require(teamLockTotalPercent <= ONE_HUNDRED_PERCENT,
                 "Too many team funds raised");
