@@ -1,11 +1,11 @@
-# 环境
+# require
 
 The following assumes the use of `node@>=12`.
 
-###  安装
+###  install
 
 `yarn`
 
-###  编译
+###  compile
 
 `npx hardhat compile`
